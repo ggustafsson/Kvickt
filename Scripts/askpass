@@ -1,0 +1,48 @@
+#!/usr/bin/swift
+
+// Description: Opens native macOS dialog window asking for password input.
+// Text entered is printed to stdout after submit.
+//
+// Examples:
+//
+//   # Shell usage.
+//   export SUDO_ASKPASS="/path/askpass"
+//   sudo --askpass <command>
+//
+//   # Ansible usage.
+//   - name: Using askpass for cask installation
+//     community.general.homebrew_cask:
+//       name: <package>
+//       state: latest
+//     environment:
+//       SUDO_ASKPASS: /path/askpass
+//
+// Usage: askpass
+//
+// Author: Göran Gustafsson <gustafsson.g@gmail.com>
+// License: BSD 3-Clause
+
+import AppKit
+
+let app = NSApplication.shared
+app.setActivationPolicy(.accessory)
+app.activate(ignoringOtherApps: true)
+
+let alert = NSAlert()
+alert.icon = NSImage(named: NSImage.cautionName)
+
+alert.messageText = "AskPass"
+alert.informativeText = "Enter password:"
+
+let input = NSSecureTextField(frame: NSRect(x: 0, y: 0, width: 260, height: 24))
+alert.accessoryView = input
+alert.window.initialFirstResponder = input
+
+alert.addButton(withTitle: "OK")
+alert.addButton(withTitle: "Cancel")
+
+if alert.runModal() == .alertFirstButtonReturn {
+    print(input.stringValue)
+    exit(0)
+}
+exit(1)
